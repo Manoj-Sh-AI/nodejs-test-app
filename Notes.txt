@@ -1,0 +1,106 @@
+INTRO TO NODE_JS
+_____________________________________index.js___________________________________________________
+// Step-1: Creating Server
+
+// const http = require("http");
+import http from "http"  // Handles Routes
+import * as myObj from "./features.js";
+import fs from "fs"; // by using this we can read/write any file
+import path from "path" // give variables such as file extinction names like .js, .html,etc and dirname and may
+
+console.log(myObj.gfName)
+console.log(myObj.printPercent());
+const home = fs.readFileSync("./index.html");
+
+const server = http.createServer((req, res) => {
+  if (req.url === "/about") {
+    res.end(`<h1>Elon musk has ${myObj.printPercent()} of Share in Twitter</h1>`);
+  }
+  else if (req.url === "/") {
+    res.end(home);  
+  }
+  else if (req.url === "/contacts") {
+    res.end("<h1>Contacts Page</h1>");
+  } else {
+    res.end("<h1>Page Not Found</h1>");
+  }
+});
+
+server.listen(5000, () => {
+  console.log("Server is working...");
+});
+
+____________________________________features.js_______________________________________________________
+export const gfName = "MrsRandom";
+
+export const printPercent = () => {
+    return `${Math.floor(Math.random() * 100)}%`;
+}
+
+____________________________________index.html_______________________________________________________
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Home</h1>
+</body>
+</html>
+_______________________________________________________________________________________________________________________
+
+
+EXPRESS JS
+
+____________________________________ExpressJS or EJS_____________________________________________________________________
+
+import express from "express";
+import path from "path"
+const server = express();  // Server is created
+
+// Setting up view engine
+server.set("view engine", "ejs");  // also prevents from writing extinctions
+const users = [];
+// USING MIDDLEWERES
+server.use(express.static(path.join(path.resolve(), "public")));  // server is using thee filepath of public folder which can be used to send Frontend/static files
+server.use(express.urlencoded({extended: true}));
+
+// public dir serves frontend files to this file
+server.get("/", (req, res) => {
+    //res.send("Hi")  syntax To send data
+
+    //res.sendStatus(206);  syntax to send status code
+
+    // res.json({
+    //     "success": true,  syntax to send json data
+    //     "products": []
+    // });
+
+    //res.status(400).send("404 is mine :)");   syntax for manipulating the status code
+
+    // const html_file_path = path.resolve();
+    // res.sendFile(path.join(html_file_path, "./index.html"));   syntax to send file data
+
+    res.render("index", {name:"Manoj S H", number:"12345"}); // extenction is not required because its already specified in view engine
+    
+});
+
+server.get("/success", (req, res) => {
+    res.render("success")
+})
+
+server.post("/contact", (req, res) =>{
+    users.push({username: req.body.name, email: req.body.email});
+    res.redirect("/success");
+});
+
+server.get("/users", (req, res) =>{
+    res.json({users});
+});
+
+server.listen(5000, () => {
+    console.log("Server is listening...")
+});
